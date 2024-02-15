@@ -4,7 +4,7 @@ const { credentials: { username, password } } = require("./credentials")
 const app = express()
 app.use(express.json());
 
-app.post('/api/auth', (req, res) => {
+app.post('/api/auth/login', (req, res) => {
     const { body } = req
     if (username === body.username && password === body.password) {
         res.status(200).send({ msg: 'Authorisation successful' })
