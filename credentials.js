@@ -1,4 +1,9 @@
-exports.credentials = {
-  "username": "cloudUser",
-  "password": "cloudIsC00l"
+// username : { password }
+
+credentials = {
+  "cloudUser": {
+    "password": "cloudIsC00l"
+  }
 }
+
+module.exports = credentials
