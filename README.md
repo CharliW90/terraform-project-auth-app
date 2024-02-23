@@ -2,6 +2,8 @@
 
 This repo contains the endpoints for authenticating user credentials and registering new users.
 
+> This service should be running in a **private** subnet and **not** publicly available. It will be accessible via the endpoints on the smart home status service.
+
 ## GET /api/auth
 
 Should respond with status 200 and no response body - to show that api is running
