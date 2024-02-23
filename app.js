@@ -6,6 +6,10 @@ const app = express()
 app.use(express.json());
 app.use(cors());
 
+app.get('/api/auth', (req, res) =>{
+    res.sendStatus(200)
+})
+
 app.post('/api/auth/login', (req, res) => {
     const { body } = req
     if (credentials[body.username] && credentials[body.username].password === body.password) {
