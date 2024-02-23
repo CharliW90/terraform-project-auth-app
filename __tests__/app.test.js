@@ -25,17 +25,17 @@ describe('User Auth Service', () => {
 
     describe('/api/auth/register', () => {
         describe('Registration Success', () => {
-            test('POST /api/auth/register - should respond with success message if credentials match existing credentials', async () => {
-                const { body } = await request(app).post("/api/auth/register").send({ username: 'anotherCloudUser', password: 'Cloud!Wow!' }).expect(200)
+            test('POST /api/auth/register - should respond with success message if credentials do not match existing credentials', async () => {
+                const { body } = await request(app).post("/api/auth/register").send({ username: 'anotherCloudUser', password: 'Cloud!Wow!' }).expect(201)
                 expect(body.msg).toBe('Registration successful')
             });
             test('POST /api/auth/register - should add given credentials to credentials object', async () => {
-                await request(app).post("/api/auth/register").send({ username: 'anotherCloudUser2', password: 'Cloud!Wow!' }).expect(200)
+                await request(app).post("/api/auth/register").send({ username: 'anotherCloudUser2', password: 'Cloud!Wow!' }).expect(201)
 
                 expect(credentials.hasOwnProperty('anotherCloudUser2')).toBe(true)
             });
             test('POST /api/auth/register - should allow login with newly registered user', async () => {
-                await request(app).post("/api/auth/register").send({ username: 'yetAnotherCloudUser', password: 'cloudIsC00l' }).expect(200)
+                await request(app).post("/api/auth/register").send({ username: 'yetAnotherCloudUser', password: 'cloudIsC00l' }).expect(201)
 
                 const { body } = await request(app).post("/api/auth/login").send({ username: 'yetAnotherCloudUser', password: 'cloudIsC00l' }).expect(200)
                 expect(body.msg).toBe('Authorisation successful')

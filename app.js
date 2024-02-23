@@ -22,7 +22,7 @@ app.post('/api/auth/register', (req, res) => {
     if (body.username && body.password) {
         if (!credentials[body.username]) {
             credentials[body.username] = { password: body.password }
-            res.status(200).send({ msg: 'Registration successful' })
+            res.status(201).send({ msg: 'Registration successful' })
         } else {
             res.status(400).send({ msg: 'Registration unsuccessful - username already exists' })
         }
