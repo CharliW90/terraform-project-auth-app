@@ -16,7 +16,7 @@ function formatDynamoData(data) {
   return user;
 }
 
-exports.addUser = (username, password) => {
+const addUser = (username, password) => {
   const hashKey = Date.now();
   const client = new DynamoDBClient({
     region: "eu-west-2",
@@ -68,7 +68,7 @@ exports.addUser = (username, password) => {
   })
 };
 
-exports.login = (username, password) => {
+const login = (username, password) => {
   return alreadyRegistered(username)
   .then((registered) => {
     if(registered){
@@ -96,11 +96,48 @@ exports.login = (username, password) => {
     if(res.Items.length === 1 && (Object.keys(res.Items[0]).includes("password"))){
       if(passwordCheck(res.Items[0].id.N, res.Items[0].password.S, password)){
         console.log(`...${res.Items[0].username.S} logged in!\n`)
-        return Promise.resolve(({ status: 201, msg: `Login for ${res.Items[0].username.S} successful!`}))
+        return Promise.resolve(({ status: 200, msg: `Login for ${res.Items[0].username.S} successful!`, id: res.Items[0].id.N}))
       }
     }
     console.log(`...login failed: Found ${res.Count} results for ${username}\nPasswordCheck returned: ${passwordCheck(res.Items[0].id.N, res.Items[0].password.S, password)}`)
     return Promise.resolve({ status: 400, msg: 'Login unsuccessful - password does not match.' })
+  })
+}
+
+const passwordChange = (username, password, newPassword) => {
+  return alreadyRegistered(username)
+  .then((registered) => {
+    if(registered){
+      return login(username, password)
+    } else {
+      return Promise.reject({ status: 400, msg: `Request unsuccessful - username "${username}" does not exist` })
+    }
+  })
+  .then((res) => {
+    if(res.status === 200){
+      const newSecret = passwordHash(res.id, newPassword)
+      console.log(`Trying to update password for ${res.id}...`)
+      const client = new DynamoDBClient({
+        region: "eu-west-2",
+        credentials: {
+          accessKeyId: process.env.ACCESS_KEY,
+          secretAccessKey: process.env.SECRET_ACCESS_KEY,
+        },
+      });
+      const command = new UpdateItemCommand({
+        TableName: process.env.TABLE_NAME,
+        Key: {id: {N: `${res.id}`}},
+        UpdateExpression: 'SET password = :new_password',
+        ExpressionAttributeValues: { ":new_password": { S: `${newSecret}` }}
+      })
+
+      return client.send(command)
+    } else {
+      return Promise.reject(res)
+    }
+  })
+  .then((res) => {
+    return Promise.resolve({ status: res.$metadata.httpStatusCode, msg: `Password for ${username} updated!`})
   })
 }
 
@@ -131,3 +168,5 @@ const alreadyRegistered = (username) => {
     }
   })
 }
+
+module.exports = { addUser, login, passwordChange }

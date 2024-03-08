@@ -4,7 +4,7 @@ require("dotenv").config({
   path: "./.env.local",
 });
 
-const { authLogin, authRegister } = require("./controller.js")
+const { authLogin, authRegister, authPassword } = require("./controller.js")
 
 const app = express()
 app.use(express.json());
@@ -17,6 +17,8 @@ app.get('/api/auth', (req, res) =>{
 app.post('/api/auth/login', authLogin);
 
 app.post('/api/auth/register', authRegister)
+
+app.patch('/api/auth/password', authPassword)
 
 app.use((err, req, res, next) => {
     if (err.status && err.msg) {
